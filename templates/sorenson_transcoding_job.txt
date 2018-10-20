@@ -1,0 +1,8 @@
+{
+"QueueId": #queueid#,
+"Status": "1",
+"JobMediaInfo": {"CompressionPresetList": [#presetids#],
+"SourceMediaList": [{"UserName": #username01#, "Password": #password01#, "FileUri": #fileurimaster#}],
+"DestinationList": [{"FileNamingMethod":"Wildcard","FileUri": #fileuritestwild#}]},
+"Name": #title#
+}
