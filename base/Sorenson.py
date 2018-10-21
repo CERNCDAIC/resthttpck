@@ -12,10 +12,11 @@ import json
 import os
 import re
 
-import ResthttpckEx
+from ResthttpckEx import ResthttpckEx
 from base.Utils import Utils
 from base.RestLogger import RestLogger
 from base.Httpbase import Httpbase
+
 
 
 
@@ -35,7 +36,16 @@ class Sorenson:
     def query_job(self, timing, status_job):
         arr = Utils.FilesYoungerthan(APPCONFIG['general']['jobidfiles'], int(timing))
         for f in arr:
-            self.GetSorenson(f)
+            try:
+                response=self.GetSorenson(f)
+                RestLogger.debug('Job status: {}'.format(json.dumps(json.loads(response.text),
+                                                                    indent=2,
+                                                                    sort_keys=True)))
+
+            except ResthttpckEx as ex:
+                if ex.http_error_code == 404:
+                    RestLogger.debug('jobid {} likely over, removing from filesystem'.format(f))
+                    os.remove(os.path.join(APPCONFIG['general']['jobidfiles'], f))
 
     def GetSorenson(self, jobid):
         username = re.sub(r'CERN\\{1,}', "", APPCONFIG['sorenson']['username01'])
@@ -43,10 +53,6 @@ class Sorenson:
         response = Httpbase.GetREST(url="{}status/{}/".format(APPCONFIG['sorenson']['url'], jobid),
                                     headers={'Accept': 'application/json'},
                                     authpair=(username, APPCONFIG['sorenson']['password01']))
-
-        # print("response json {}".format(response.json()))
-        # print("type {}".format(type(response.json())))
-        # print(response.json()['JobId'])
         return response
     def _CreateJobs(self, title, single=False):
         pathtotpl = os.path.join('../templates', 'sorenson_transcoding_job.txt')

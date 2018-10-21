@@ -9,4 +9,9 @@
 # or submit itself to any jurisdiction.
 
 class ResthttpckEx(Exception):
-    pass
+    def __init__(self, message, http_error_code):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+        # Now for your custom code...
+        self.http_error_code = http_error_code
