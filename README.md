@@ -78,3 +78,33 @@ Configuration files are expected to be located at:
 - For the resthttpck.ini: '/etc/resthttpck/resthttpck.ini'
 
 Folder for logs and files located at '/var/log/resthttpck' and '/var/log/resthttpck/files'
+
+ini example:
+```
+[sorenson]
+url=https://domain/api/jobs/
+presetids=ed4133a6-dfcb-407e-89d2-5a74d23961bb,9d301467-3f22-41ea-add5-9bf829be6e1c,e87ae9f2-ceab-412e-a5e7-5c180f156762
+queueid=4d725f86-f9d2-4d55-93e9-6acbe44a0e1d
+username01=CERN\\\\cdssoren
+password01=x654BUSQpHcw
+masterfiles=CERN-VIDEO-2006-014-001.avi
+masterfiles_path=//cern.ch/dfs/Scratch/webcast/master
+fileuritest=//cern.ch/dfs/Scratch/test
+fileuritestwild=//cern.ch/dfs/Scratch/test/%%SOURCE%%_%%JOBID%%_%%PRESET%%
+mysql_user=read_only_guy
+mysql_host=XXXXX
+mysql_port=XXXX
+mysql_db=
+mysql_password=XXXX
+mysql_charset=utf-8
+[vidyo]
+user_wsdl=https://domain/services/v1_1/VidyoPortalUserService?wsdl
+admin_wsdl=https://domain/services/v1_1/VidyoPortalAdminService?wsdl
+username=XXXXXX
+password=XXXXX
+owner=webcast
+mysql_db=db_host:db_port:user:password:db:utf8
+[general]
+tempfiles=/var/log/resthttpck/files
+jobidfiles=/var/log/resthttpck/files/jobids
+```
