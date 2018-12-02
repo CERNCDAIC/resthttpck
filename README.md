@@ -85,10 +85,10 @@ ini example:
 url=https://domain/api/jobs/
 presetids=ed4133a6-dfcb-407e-89d2-5a74d23961bb,9d301467-3f22-41ea-add5-9bf829be6e1c,e87ae9f2-ceab-412e-a5e7-5c180f156762
 queueid=4d725f86-f9d2-4d55-93e9-6acbe44a0e1d
-username01=CERN\\\\cdssoren
+username01=CERN\\\\XXXXX
 password01=x654BUSQpHcw
 masterfiles=CERN-VIDEO-2006-014-001.avi
-masterfiles_path=//cern.ch/dfs/Scratch/webcast/master
+masterfiles_path=//cern.ch/dfs/Scratch/master
 fileuritest=//cern.ch/dfs/Scratch/test
 fileuritestwild=//cern.ch/dfs/Scratch/test/%%SOURCE%%_%%JOBID%%_%%PRESET%%
 mysql_user=read_only_guy
