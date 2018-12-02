@@ -17,9 +17,6 @@ from base.Utils import Utils
 from base.RestLogger import RestLogger
 from base.Httpbase import Httpbase
 
-
-
-
 from config import APPCONFIG
 
 class Sorenson:

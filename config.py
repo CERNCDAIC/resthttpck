@@ -85,6 +85,13 @@ try:
         APPCONFIG['general'] = {}
         APPCONFIG['general']['tempfiles'] = CONFIG.get('general', 'tempfiles')
         APPCONFIG['general']['jobidfiles'] = CONFIG.get('general', 'jobidfiles')
+    if CONFIG.has_section('vidyo'):
+        APPCONFIG['vidyo'] = {}
+        APPCONFIG['vidyo']['username'] = CONFIG.get('vidyo', 'username')
+        APPCONFIG['vidyo']['password'] = CONFIG.get('vidyo', 'password')
+        APPCONFIG['vidyo']['admin_wsdl'] = CONFIG.get('vidyo', 'admin_wsdl')
+        APPCONFIG['vidyo']['owner'] = CONFIG.get('vidyo', 'owner')
+        APPCONFIG['vidyo']['mysql_db'] = CONFIG.get('vidyo', 'mysql_db')
 except IOError as e:
     traceback.print_exc(file=sys.stdout)
     sys.exit(e.code)

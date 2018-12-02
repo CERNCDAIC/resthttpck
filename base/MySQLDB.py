@@ -14,3 +14,13 @@ import pymysql
 class MySQLDB:
 
     def __init__(self, host, port, user, password, db, charset):
+        self.connection = pymysql.connect(host=host,
+                                     user=user,
+                                     password=password,
+                                     db=db,
+                                     charset=charset,
+                                     cursorclass=pymysql.cursors.DictCursor)
+
+
+    def selectstmt(self, sql, *params):
+        with self.connection.cursor() as cursor:

@@ -55,6 +55,15 @@ class Utils:
         return '{}_{}'.format(prefix, random_string)
 
     @staticmethod
+    def GenerateNumber(prefix, digits):
+        total=str(prefix)
+        nrs = [str(random.randrange(10)) for i in range(digits - 1)]
+        for i in range(len(nrs)):
+            total += str(nrs[i])
+        return int(total)
+
+
+    @staticmethod
     def CreateEmptyFile(path):
         with open(path, 'a'):
             os.utime(path, None)
