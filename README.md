@@ -59,4 +59,22 @@ optional arguments:
 
 ## Install
 
+Do:
+```
+git clone https://github.com/CERNCDAIC/resthttpck.git
+cd resthttpck
+# in case not have installed
+pip install virtualenv   
+virtualenv -p python3 ./venv
+source .venv/bin/activate
+# prepare the project
+pip install requirements.txt 
+python setup.py develop
+```
+## Configuration
 
+Configuration files are expected to be located at:
+- For the logging: '/etc/resthttpck/logging.conf'
+- For the resthttpck.ini: '/etc/resthttpck/resthttpck.ini'
+
+Folder for logs and files located at '/var/log/resthttpck' and '/var/log/resthttpck/files'
