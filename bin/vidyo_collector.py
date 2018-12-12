@@ -9,26 +9,28 @@
 # or submit itself to any jurisdiction.
 
 import argparse
-import re
 import os
+import time
+from datetime import datetime
+from datetime import timedelta
 
-import base.Sorenson
-import base.Vidyo
-import base.MySQLDB
-from base.Utils import Utils
+
+from base.MySQLDB import MySQLDB
 from base.RestLogger import RestLogger
-from base.Httpbase import Httpbase
 from config import APPCONFIG
+from base.Utils import Utils
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Processing of tasks')
-    parser.add_argument('--c', action='store', type=str, dest='classtest', required=True, default='Sorenson',
-                        help='Sorenson test')
-    parser.add_argument('--t', action='store', type=str, dest='whichtest', required=True, default=None,
-                        help='type of job to be sent e.g. Sorenson:transcoding ')
-    parser.add_argument('--n', action='store', type=int, dest='numberofjobs', required=False, default=1,
-                        help='how many of whichtest jobs to be sent')
+    parser.add_argument('--path', action='store', type=str, dest='sqlpath', required=False,
+                        help='sqlstatements to execute in a directory')
+    parser.add_argument('--file', action='store', type=str, dest='sqlfile', required=False,
+                        help='sqlstatement to execute in a file')
+    parser.add_argument('--from', action='store', type=str, dest='fromtime', required=False,
+                        help='from where to start to look for')
+    parser.add_argument('--sleeptime', action='store', type=int, dest='sleeptime', required=False, default=10,
+                        help='how often to run the loop in secs')
 
 
     results = parser.parse_args()
@@ -36,6 +38,20 @@ if __name__ == '__main__':
 
     RestLogger.debug(parser.parse_args())
 
-    host, port, username, password, db, charset = APPCONFIG['vidyo']['mysqldb']
+    if not results.fromtime:
+        results.fromtime = datetime.today() - timedelta(hours=1)
 
-    mysqldb = base.MySQLDB(host, port, username, password, db, charset)
+
+    host, port, username, password, db, charset = APPCONFIG['vidyo']['mysql_db'].split(':')
+    mysqldb = MySQLDB(host, port, username, password, db, charset)
+    if results.sqlpath and os.path.exists(results.sqlpath):
+        while True:
+            rows = mysqldb.selectstmts(results.sqlpath, results.fromtime.strftime('%Y-%m-%d %H-%M-%S'))
+            Utils.AppendToFile(Utils.GenerateNameFile(APPCONFIG['vidyo']['sqllogs'], "cdraccess", '%Y%m%d'), rows)
+            time.sleep(results.sleeptime)
+            results.fromtime = datetime.today() - timedelta(minutes=results.sleeptime)
+
+
+
+
+

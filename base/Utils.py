@@ -78,3 +78,17 @@ class Utils:
                 arr_files.append(f)
                 RestLogger.debug("{} fulfills criteria".format(f))
         return arr_files
+
+    @staticmethod
+    def ListOfFiles(path):
+        return [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+    @staticmethod
+    def AppendToFile(path, message):
+        with open(path, 'a', 1) as f:
+            for line in message:
+                f.write(os.linesep.join(line))
+
+    @staticmethod
+    def GenerateNameFile(path, prefix, timeformatpattern):
+        return os.path.join(path,"{}-{}.log".format(prefix, time.strftime(timeformatpattern)))

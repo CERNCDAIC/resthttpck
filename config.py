@@ -8,14 +8,12 @@
 # granted to it by virtue of its status as Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-import logging
-import logging.config
+
 import configparser
 import sys
 import traceback
-import json
+
 import os
-import platform
 from base.RestLogger import RestLogger
 
 
@@ -92,6 +90,9 @@ try:
         APPCONFIG['vidyo']['admin_wsdl'] = CONFIG.get('vidyo', 'admin_wsdl')
         APPCONFIG['vidyo']['owner'] = CONFIG.get('vidyo', 'owner')
         APPCONFIG['vidyo']['mysql_db'] = CONFIG.get('vidyo', 'mysql_db')
+        APPCONFIG['vidyo']['sqlpath'] = CONFIG.get('vidyo', 'sqlpath')
+        APPCONFIG['vidyo']['sqllogs'] = CONFIG.get('vidyo', 'sqllogs')
+
 except IOError as e:
     traceback.print_exc(file=sys.stdout)
     sys.exit(e.code)

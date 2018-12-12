@@ -7,6 +7,49 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as Intergovernmental Organization
 # or submit itself to any jurisdiction.
+"""Once you are in your container running Python 3.6, in order to test Sorenson do:
+
+Sorenson:
+
+- Submit jobs for transcoding where you can indicate if you want to use multiple e.g. false or single e.g. true
+
+Example: transcoding_job_true_algo  it's a single job and title is 'algo'. --n indicates how many you want to send.
+
+    $python http_tester.py --c Sorenson --t transcoding_job_true_algo --n 1
+
+- Query for jobs submitted in less than X hours: e.g. query_job_1 in less than one hour
+
+$python http_tester.py --c sorenson --t query_job_1
+
+Vidyo:
+
+- Print the WSDL definition file in use, see config file.
+
+Example:
+    $python http_tester.py --c vidyo --t PrintWSDLdefinition
+
+- Create a public room:
+
+Example: where first parameter (:True) indicates if it's locked, second if it has PIN or not and,
+ third if it has moderator PIN. PIN will be generated randomly.
+
+    $python http_tester.py --c vidyo --t CreatePublicRoom:True:True:True
+
+- Change Room profile: profile can just be 'NoAudioAndVideo' or empty one. In the latter the profile is reset. RoomID is
+the first parmeter.
+Example:
+    $python http_tester.py --c vidyo --t ToggleRoomProfile:85589:NoAudioAndVideo
+
+- Get Room profile
+Example:
+    $python http_tester.py --c vidyo --t GetRoomProfile:85593
+
+- Update room: you indicate the extension (due to Vidyo API) and the new owner (It must already exist)
+Example:
+$python http_tester.py --c vidyo --t UpdateRoomOwner:109991939:XXXXXX
+
+"""
+
 
 import argparse
 import re
@@ -17,12 +60,11 @@ import base.Vidyo
 from ResthttpckEx import ResthttpckEx
 from base.Utils import Utils
 from base.RestLogger import RestLogger
-from base.Httpbase import Httpbase
 from config import APPCONFIG
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Processing of tasks')
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--c', action='store', type=str, dest='classtest', required=True, default='Sorenson',
                         help='Sorenson test')
     parser.add_argument('--t', action='store', type=str, dest='whichtest', required=True, default=None,
@@ -34,7 +76,7 @@ if __name__ == '__main__':
     # query_job_1
     parser.add_argument('--n', action='store', type=int, dest='numberofjobs', required=False, default=1,
                         help='how many of whichtest jobs to be sent')
-
+    argparse.ArgumentParser(description=__doc__)
 
     results = parser.parse_args()
     RestLogger(name='resthttpck', logconfig='/etc/resthttpck/logging.conf')
