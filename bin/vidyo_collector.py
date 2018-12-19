@@ -15,7 +15,7 @@ from datetime import datetime
 from datetime import timedelta
 
 
-from base.MySQLDB import MySQLDB
+from base.QueryWorker import QueryWorker
 from base.RestLogger import RestLogger
 from config import APPCONFIG
 from base.Utils import Utils
@@ -23,14 +23,14 @@ from base.Utils import Utils
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Processing of tasks')
-    parser.add_argument('--path', action='store', type=str, dest='sqlpath', required=False,
+    parser.add_argument('--path', action='store', type=str, dest='sqlpaths', required=False,
                         help='sqlstatements to execute in a directory')
     parser.add_argument('--file', action='store', type=str, dest='sqlfile', required=False,
                         help='sqlstatement to execute in a file')
     parser.add_argument('--from', action='store', type=str, dest='fromtime', required=False,
                         help='from where to start to look for')
     parser.add_argument('--sleeptime', action='store', type=int, dest='sleeptime', required=False, default=10,
-                        help='how often to run the loop in secs')
+                        help='how often to run the loop in minutes')
 
 
     results = parser.parse_args()
@@ -41,15 +41,22 @@ if __name__ == '__main__':
     if not results.fromtime:
         results.fromtime = datetime.today() - timedelta(hours=1)
 
+    threads = []
+    for p in results.sqlpaths.split(':'):
+        RestLogger.debug('Checking path <{}>'.format(p))
+        if 'mysql' in p and 'vidyo' in p:
+            host, port, username, password, db, charset = APPCONFIG['vidyo']['mysql_db'].split(':')
+            sqllogpath = APPCONFIG['vidyo']['sqllogs']
+        else:
+            RestLogger.debug("Wrong path name, please include provider e.g. vidyo and type of db e.g. 'mysql' ")
+            continue
+        thread = QueryWorker(p, results.sleeptime, sqllogpath, results.fromtime, host, port,
+                             username, password, db, charset)
+        threads += [thread]
+        thread.start()
 
-    host, port, username, password, db, charset = APPCONFIG['vidyo']['mysql_db'].split(':')
-    mysqldb = MySQLDB(host, port, username, password, db, charset)
-    if results.sqlpath and os.path.exists(results.sqlpath):
-        while True:
-            rows = mysqldb.selectstmts(results.sqlpath, results.fromtime.strftime('%Y-%m-%d %H-%M-%S'))
-            Utils.AppendToFile(Utils.GenerateNameFile(APPCONFIG['vidyo']['sqllogs'], "cdraccess", '%Y%m%d'), rows)
-            time.sleep(results.sleeptime)
-            results.fromtime = datetime.today() - timedelta(minutes=results.sleeptime)
+    for x in threads:
+        x.join()
 
 
 

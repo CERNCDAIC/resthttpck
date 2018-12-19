@@ -85,9 +85,10 @@ class Utils:
 
     @staticmethod
     def AppendToFile(path, message):
-        with open(path, 'a', 1) as f:
+        with open(path, 'a') as f:
             for line in message:
-                f.write(os.linesep.join(line))
+                f.write(''.join(line) + os.linesep)
+
 
     @staticmethod
     def GenerateNameFile(path, prefix, timeformatpattern):
