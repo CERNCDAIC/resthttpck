@@ -1,0 +1,14 @@
+version: '3'
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.5.4
+    command: filebeat -e -strict.perms=false 
+    volumes:
+      - /private/var/log/resthttpck/cdraccess:/var/log/resthttpck/cdraccess:ro
+      - /Users/rgaspar/filebeat-6.5.3-darwin-x86_64/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+  vidyostats:
+    image: vidyostats:latest
+    command: python ./bin/vidyo_collector.py --path /etc/resthttpck/sql/mysql-vidyocon:/etc/resthttpck/sql/mysql-vidyoinstall 
+    volumes:
+      - /private/var/log/resthttpck/cdraccess:/var/log/resthttpck/cdraccess
+      - /etc/resthttpck:/etc/resthttpck

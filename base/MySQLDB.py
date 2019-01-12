@@ -9,20 +9,42 @@
 # or submit itself to any jurisdiction.
 
 import pymysql
-from prettytable import PrettyTable
+
+
 from base.Utils import Utils
 from base.RestLogger import RestLogger
 
-class MySQLDB:
+
+class MySQLDB():
 
     def __init__(self, host, port, user, password, db, charset):
+        self.host = host
+        self.port = int(port)
+        self.user = user
+        self.password = password
+        self.db = db
+        self.charset = charset
         self.connection = pymysql.connect(host=host,
-                                     user=user,
-                                     port=int(port),
-                                     password=password,
-                                     db=db,
-                                     charset=charset,
-                                     cursorclass=pymysql.cursors.DictCursor)
+                                          user=user,
+                                          port=int(port),
+                                          password=password,
+                                          db=db,
+                                          charset=charset,
+                                          cursorclass=pymysql.cursors.DictCursor)
+
+    def __enter__(self):
+        self.connection = pymysql.connect(host=self.host,
+                                          user=self.user,
+                                          port=self.port,
+                                          password=self.password,
+                                          db=self.db,
+                                          charset=self.charset,
+                                          cursorclass=pymysql.cursors.DictCursor)
+        return self
+
+    def __exit__(self, *args):
+        if self.connection:
+            self.connection.close()
 
 
     def selectstmt(self, sql, *params):
@@ -38,8 +60,9 @@ class MySQLDB:
             fullrows = []
             for r in result:
                 row = [r[name[0]] for name in desc]
-                fullrows.append(','.join(map(str, row)))
+                fullrows.append('##'.join(map(str, row)))
             return fullrows
+
 
 
     def selectstmts(self, path, *params):

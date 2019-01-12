@@ -21,20 +21,28 @@ from base.Utils import Utils
 
 class QueryWorker(Thread):
 
-    def __init__(self, pathtoqueries, timetosleep, writelogspath, fromtime, host, port, username, password, db, charset):
+    def __init__(self, pathtoqueries, timetosleep, writelogspath, fromtime,
+                 host, port, username, password, db, charset):
         Thread.__init__(self)
         self.pathtoqueries = os.path.normpath(pathtoqueries)
         self.fromtime = fromtime
         self.writelogspath = writelogspath
-        dbtype, self.namelog = os.path.basename(os.path.normpath(pathtoqueries)).split('-')
-        if dbtype == 'mysql':
-            self.mysqldb = MySQLDB(host, port, username, password, db, charset)
+        self.dbtype, self.namelog = os.path.basename(os.path.normpath(pathtoqueries)).split('-')
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.db = db
+        self.charset = charset
         self.sleep = timetosleep
 
     def run(self):
         while True:
             RestLogger.debug("Fromtime is <{}>".format(self.fromtime.strftime('%Y-%m-%d %H-%M-%S')))
-            rows = self.mysqldb.selectstmts(self.pathtoqueries, self.fromtime.strftime('%Y-%m-%d %H-%M-%S'))
+            rows = None
+            if self.dbtype == 'mysql':
+                with MySQLDB(self.host, self.port, self.username, self.password, self.db, self.charset) as mysqlobj:
+                    rows = mysqlobj.selectstmts(self.pathtoqueries, self.fromtime.strftime('%Y-%m-%d %H-%M-%S'))
             if self._is2DList(rows):
                 for arr in rows:
                     Utils.AppendToFile(Utils.GenerateNameFile(self.writelogspath, self.namelog, '%Y%m%d'), arr)
