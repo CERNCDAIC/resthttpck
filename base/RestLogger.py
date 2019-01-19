@@ -22,6 +22,8 @@ class RestLogger:
             with open(logconfig) as jdata:
                 config_logging = json.load(jdata)
                 logging.config.dictConfig(config_logging)
+        else:
+            print("{} doesnt exist...".format('/etc/resthttpck/logging.conf'))
 
             RestLogger.logger = logging.getLogger(name)
     @classmethod
