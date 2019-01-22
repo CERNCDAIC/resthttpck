@@ -1,0 +1,92 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: manila-cephfs-share
+provisioner: manila-provisioner
+parameters:
+  type: "Meyrin CephFS"
+  zones: nova
+  osSecretName: os-trustee
+  osSecretNamespace: kube-system
+  protocol: CEPHFS
+  backend: csi-cephfs
+  csi-driver: csi-cephfsplugin
+  osShareID: c1be6f41-4d16-4651-a825-fd7317b4945c
+  osShareAccessID: 3a592558-4391-4a0f-9adc-ea58e182842c
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: manila-cephfs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100G
+  storageClassName: manila-cephfs-share
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: avstats
+spec:
+  selector:
+    matchLabels:
+      app: avstats
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avstats
+    spec:
+      containers:
+      - name: filebeats
+        image: docker.elastic.co/beats/filebeat:6.5.4 
+        command: ["filebeat", "-e", "-strict.perms=false", "-c", "/etc/resthttpck/filebeat.yml"]
+        volumeMounts:
+          - mountPath: /var/log/resthttpck/cdraccess
+            name: vidyo01
+          - mountPath: /etc/resthttpck
+            name: filebeat-config
+            readOnly: true    
+      - name: avstats
+        image: gitlab-registry.cern.ch/collaborativeapps/resthttpck:latest
+        command: ["python", "./bin/vidyo_collector.py", "--path", "./sql/mysql-vidyocon:./sql/mysql-vidyoinstall"]
+        volumeMounts:
+          - mountPath: /var/log/resthttpck/cdraccess
+            name: vidyo01
+          - mountPath: /etc/resthttpck/resthttpck.ini
+            subPath: resthttpck.ini
+            name: resthttpck-config
+            readOnly: true
+          - mountPath: /etc/resthttpck/logging.conf
+            subPath: logging.conf
+            name: logging-config
+            readOnly: true
+      volumes:      
+      - name: vidyo01
+        persistentVolumeClaim:
+          claimName: manila-cephfs-pvc
+          readOnly: false
+      - name: resthttpck-config
+        configMap:
+          name: vidyostats-config
+          items:
+          - key: resthttpck.ini
+            path: resthttpck.ini
+      - name: logging-config
+        configMap:
+          name: vidyostats-config
+          items:
+          - key: logging.conf
+            path: logging.conf
+      - name: filebeat-config
+        configMap:
+          name: filebeat-config
+          items:
+            - key: filebeat.yml
+              path: filebeat.yml 
+      imagePullSecrets:
+      - name: regcred
+ 

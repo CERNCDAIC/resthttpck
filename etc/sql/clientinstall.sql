@@ -1,1 +1,0 @@
-SELECT userName, displayName, tenantName, EID, ipAddress, hostName, roomName, roomOwner, convert_tz(timeInstalled, @@session.time_zone, '+00:00') FROM portal2.ClientInstallations2 where timeInstalled > %s

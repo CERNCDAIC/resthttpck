@@ -19,13 +19,13 @@ class RestLogger:
 
     def __init__(self, name='resthttpck', logconfig='/etc/resthttpck/logging.conf'):
         if os.path.exists(logconfig):
-            with open(logconfig) as jdata:
+            with open(logconfig) as (jdata):
                 config_logging = json.load(jdata)
                 logging.config.dictConfig(config_logging)
         else:
             print("{} doesnt exist...".format('/etc/resthttpck/logging.conf'))
 
-            RestLogger.logger = logging.getLogger(name)
+        RestLogger.logger = logging.getLogger(name)
     @classmethod
     def debug(cls, string):
         cls.logger.debug(string)
