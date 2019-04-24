@@ -9,16 +9,15 @@
 # or submit itself to any jurisdiction.
 
 import argparse
-import os
-import time
 from datetime import datetime
 from datetime import timedelta
 
 
 from base.QueryWorker import QueryWorker
+from base.CleanUpWorker import CleanUpWorker
 from base.RestLogger import RestLogger
 from config import APPCONFIG
-from base.Utils import Utils
+
 
 if __name__ == '__main__':
 
@@ -31,7 +30,8 @@ if __name__ == '__main__':
                         help='from where to start to look for')
     parser.add_argument('--sleeptime', action='store', type=int, dest='sleeptime', required=False, default=10,
                         help='how often to run the loop in minutes')
-
+    parser.add_argument('--cleanup', action='store', type=int, dest='cleanup', required=False, default=0,
+                        help='How many days logs files are kept')
 
     results = parser.parse_args()
     RestLogger(name='resthttpck', logconfig='/etc/resthttpck/logging.conf')
@@ -52,6 +52,10 @@ if __name__ == '__main__':
             continue
         thread = QueryWorker(p, results.sleeptime, sqllogpath, results.fromtime, host, port,
                              username, password, db, charset)
+        threads += [thread]
+        thread.start()
+    if results.cleanup:
+        thread = CleanUpWorker(APPCONFIG['vidyo']['sqllogs'], 10 * results.sleeptime, results.cleanup)
         threads += [thread]
         thread.start()
 
