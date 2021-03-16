@@ -74,8 +74,8 @@ if __name__ == '__main__':
     # possible values for Sorenson are:
     # transcoding_job_False or transcoding_job_True
     # query_job_1
-    parser.add_argument('--n', action='store', type=int, dest='numberofjobs', required=False, default=1,
-                        help='how many of whichtest jobs to be sent')
+    #parser.add_argument('--n', action='store', type=int, dest='numberofjobs', required=False, default=1,
+    #                    help='how many of whichtest jobs to be sent')
     argparse.ArgumentParser(description=__doc__)
 
     results = parser.parse_args()

@@ -108,3 +108,26 @@ mysql_db=db_host:db_port:user:password:db:utf8
 tempfiles=/var/log/resthttpck/files
 jobidfiles=/var/log/resthttpck/files/jobids
 ```
+
+## Kubernetes cluster for online data collection from Vidyo
+
+Basically a pod with two containers has been configured. On container fetches the data from Vidyo MySQL CDR database and writes every record on a file. A second container reads that file and sends it to logstash for ingestion into Elasticsearch. The file is located on a shared between both containers CEPH volume.
+
+[CERN Kubernetes infrastructure](https://clouddocs.web.cern.ch/containers/README.html) (authentication required) has been used. 
+
+```
+--create image
+docker build -f Dockerfile .
+docker build -t gitlab-registry.cern.ch/collaborativeapps/resthttpck .
+docker push gitlab-registry.cern.ch/collaborativeapps/resthttpck
+
+--setup environment
+$ eval $(ai-rc "IT project")
+$ . ./env_zoom-av.sh
+--further setup omitted 
+$ kubectl apply -f avstats.yml
+```
+
+This leads to some dahsboards in Kibana e.g. network representation of which meetings and which routers/gateways are in used (thicker lines imply higher utilization):
+
+![](./images/vidyonetwork.png)

@@ -28,7 +28,7 @@ class Sorenson:
     def transcoding_job(self, title='A default job', single=False):
         self.title = title
         self.single = single
-        return self._CreateJobs(single, title)
+        return self._CreateJobs(title, single)
 
     def query_job(self, timing, status_job):
         arr = Utils.FilesYoungerthan(APPCONFIG['general']['jobidfiles'], int(timing))
